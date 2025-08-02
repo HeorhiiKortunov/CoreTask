@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,7 +32,9 @@ public class User extends TenantEntity{
 	@Column(nullable = false)
 	private String password;
 
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 20)
-	private Role role;
+	@Column(name = "role")
+	private Set<Role> roles = new HashSet<>();
 }
