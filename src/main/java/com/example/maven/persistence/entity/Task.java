@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class Task extends TenantEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	long id;
+	Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project_id", nullable = false)

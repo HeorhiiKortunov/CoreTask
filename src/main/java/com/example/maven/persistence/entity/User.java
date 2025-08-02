@@ -16,7 +16,7 @@ import lombok.Setter;
 public class User extends TenantEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	long id;
+	Long id;
 
 	@Column(nullable = false)
 	private String username;

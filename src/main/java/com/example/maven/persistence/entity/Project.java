@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class Project extends TenantEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	long id;
+	Long id;
 
 	@Column(length = 20)
 	private String name;
