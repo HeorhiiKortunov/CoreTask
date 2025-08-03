@@ -46,6 +46,9 @@ public class InvitationService {
 		var user = invitationMapper.fromAcceptDto(dto, invitation);
 		var savedUser = userRepository.save(user);
 
+		invitation.setAccepted(true);
+		invitationRepository.save(invitation);
+
 		return userMapper.toResponseDto(savedUser);
 	}
 }

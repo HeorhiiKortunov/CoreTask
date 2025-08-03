@@ -31,6 +31,7 @@ public class InvitationMapper {
         user.setEmail(invitation.getEmail());
         user.setPassword(dto.password());
         user.setRoles(Set.of(Role.ROLE_MEMBER));
+        user.setCompany(invitation.getCompany());
 
         return user;
     }
