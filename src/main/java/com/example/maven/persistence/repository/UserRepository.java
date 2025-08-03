@@ -5,8 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-	List<User> findByCompany_Id(Long companyId);
+	Optional<User> findByIdAndCompany_Id(long id, long companyId);
+	List<User> findAllByCompany_Id(long companyId);
 }

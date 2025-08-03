@@ -3,9 +3,6 @@ package com.example.maven.api.dto.request.user;
 import jakarta.validation.constraints.*;
 
 public record UserCreateDto(
-	@Positive(message = "Company id must be positive")
-	long companyId,
-
 	@NotBlank(message = "Username is required")
 	String username,
 
