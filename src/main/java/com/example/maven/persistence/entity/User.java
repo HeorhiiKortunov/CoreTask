@@ -24,6 +24,7 @@ public class User extends TenantEntity{
 	@Column(nullable = false)
 	private String username;
 
+	@Column(nullable = false)
 	private String displayedName;
 
 	@Column(nullable = false, unique = true)
