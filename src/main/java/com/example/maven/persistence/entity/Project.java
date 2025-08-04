@@ -19,9 +19,10 @@ public class Project extends TenantEntity{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
-	@Column(length = 20)
+	@Column(length = 20, nullable = false)
 	private String name;
 
+	@Column(nullable = false)
 	private String description;
 
 	@Column(nullable = false, updatable = false)
