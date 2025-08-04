@@ -34,10 +34,12 @@ public class Task extends TenantEntity{
 	private User assignee;
 
 	@Enumerated(EnumType.STRING)
-	private TaskStatus status = TaskStatus.TODO;;
+	private TaskStatus status = TaskStatus.TODO;
 
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
+
+	private LocalDateTime dueTo;
 
 	@PrePersist
 	public void onCreate() {
