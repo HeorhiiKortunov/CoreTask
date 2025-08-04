@@ -6,11 +6,13 @@ import com.example.maven.api.dto.request.user.UserUpdateRolesDto;
 import com.example.maven.api.dto.response.UserResponseDto;
 import com.example.maven.api.mapper.UserMapper;
 import com.example.maven.exception.ResourceNotFoundException;
+import com.example.maven.persistence.entity.User;
 import com.example.maven.persistence.repository.CompanyRepository;
 import com.example.maven.persistence.repository.UserRepository;
 import com.example.maven.utils.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,37 +28,33 @@ public class UserService {
 
 	public UserResponseDto createUser(UserCreateDto dto){
 		var user = userMapper.fromCreateDto(dto);
+		user.setCompany(companyRepository.findById(SecurityUtils.getCurrentTenantId())
+				.orElseThrow(() -> new AccessDeniedException("No current company found")));
 		var savedUser = userRepository.save(user);
 
 		return userMapper.toResponseDto(savedUser);
 	}
 
 	public UserResponseDto findById(long id) {
-		var user = userRepository.findByIdAndCompany_Id(id, SecurityUtils.getCurrentTenantId())
-				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
-		return userMapper.toResponseDto(user);
+		return userMapper.toResponseDto(getUserById(id));
 	}
 
-	public List<UserResponseDto> findUsersByCompany() {
+	public List<UserResponseDto> findCompanyUsers() {
 		return userRepository.findAllByCompany_Id(SecurityUtils.getCurrentTenantId()).stream()
 				.map(userMapper::toResponseDto)
 				.toList();
 	}
 
 	public UserResponseDto updateUser(long id, UserUpdateDto dto) {
-		var user = userRepository.findByIdAndCompany_Id(id, SecurityUtils.getCurrentTenantId())
-				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
+		var user = getUserById(id);
 		userMapper.updateFromDto(user, dto);
-
 		var savedUser = userRepository.save(user);
+
 		return userMapper.toResponseDto(savedUser);
 	}
 
 	public UserResponseDto updateUserRolesById(long id, UserUpdateRolesDto dto) {
-		var user = userRepository.findByIdAndCompany_Id(id, SecurityUtils.getCurrentTenantId())
-				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
+		var user = getUserById(id);
 		userMapper.updateRolesFromDto(user, dto);
 		var savedUser = userRepository.save(user);
 
@@ -64,10 +62,12 @@ public class UserService {
 	}
 
 	//TODO: Only for the user himself or admin(in controller)
-	public void deleteUserBy(long id) {
-		var user = userRepository.findByIdAndCompany_Id(id, SecurityUtils.getCurrentTenantId())
-				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+	public void deleteUser(long id) {
+		userRepository.delete(getUserById(id));
+	}
 
-		userRepository.delete(user);
+	private User getUserById(long id){
+		return userRepository.findByIdAndCompany_Id(id, SecurityUtils.getCurrentTenantId())
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
 	}
 }

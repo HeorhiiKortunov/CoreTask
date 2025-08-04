@@ -19,7 +19,6 @@ public class UserMapper {
 
 	public User fromCreateDto(UserCreateDto dto){
 		User user = new User();
-		user.setCompany(companyRepository.findById(dto.companyId()).orElseThrow(() -> new ResolutionException("Company not found")));
 		user.setUsername(dto.username());
 		user.setDisplayedName(dto.displayedName());
 		user.setEmail(dto.email());
