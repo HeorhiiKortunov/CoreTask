@@ -1,5 +1,6 @@
 package com.example.maven.service;
 
+import com.example.maven.api.dto.request.user.UserCreateDto;
 import com.example.maven.api.dto.request.user.UserUpdateDto;
 import com.example.maven.api.dto.request.user.UserUpdateRolesDto;
 import com.example.maven.api.dto.response.UserResponseDto;
@@ -22,6 +23,13 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final UserMapper userMapper;
 	private final CompanyRepository companyRepository;
+
+	public UserResponseDto createUser(UserCreateDto dto){
+		var user = userMapper.fromCreateDto(dto);
+		var savedUser = userRepository.save(user);
+
+		return userMapper.toResponseDto(savedUser);
+	}
 
 	public UserResponseDto findById(long id) {
 		var user = userRepository.findByIdAndCompany_Id(id, SecurityUtils.getCurrentTenantId())
@@ -55,6 +63,7 @@ public class UserService {
 		return userMapper.toResponseDto(savedUser);
 	}
 
+	//TODO: Only for the user himself or admin(in controller)
 	public void deleteUserBy(long id) {
 		var user = userRepository.findByIdAndCompany_Id(id, SecurityUtils.getCurrentTenantId())
 				.orElseThrow(() -> new ResourceNotFoundException("User not found"));

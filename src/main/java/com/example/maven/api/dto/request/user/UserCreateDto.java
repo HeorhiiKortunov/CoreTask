@@ -15,5 +15,7 @@ public record UserCreateDto(
 
 	@NotBlank(message = "Password is required")
 	@Size(min = 6, message = "Password must be at least 6 characters long")
-	String password
+	String password,
+
+	long companyId
 ) {}

@@ -6,6 +6,5 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.Set;
 
 public record UserUpdateRolesDto(
-		@NotBlank(message = "Roles are required")
-		Set<Role> roles
+		@NotBlank(message = "Roles are required") Set<Role> roles
 ) {}
