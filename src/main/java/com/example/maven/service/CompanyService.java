@@ -22,10 +22,10 @@ public class CompanyService {
 	private final UserService userService;
 
 	public CompanyResponseDto createCompany(CompanyCreateDto dto){
-		//Creating first admin
-		UserResponseDto user = userService.createUser(dto.firstAdmin());
+		//Creating owner
+		UserResponseDto owner = userService.createUser(dto.owner());
 		UserUpdateRolesDto rolesDto = new UserUpdateRolesDto(Set.of(Role.ROLE_MEMBER, Role.ROLE_ADMIN, Role.ROLE_OWNER));
-		userService.updateUserRolesById(user.id(), rolesDto);
+		userService.updateUserRolesById(owner.id(), rolesDto);
 
 		//Creating the company itself
 		var savedCompany = companyRepository.save(companyMapper.fromCreateDto(dto));

@@ -7,5 +7,5 @@ public record CompanyCreateDto(
 		@NotBlank(message = "Company name is required")
 		String name,
 
-		UserCreateDto firstAdmin
+		UserCreateDto owner
 ) {}
