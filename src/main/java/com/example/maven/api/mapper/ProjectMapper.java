@@ -17,11 +17,9 @@ public class ProjectMapper {
 		return project;
 	}
 
-	public Project fromUpdateDto(Project project, ProjectUpdateDto dto){
+	public void fromUpdateDto(Project project, ProjectUpdateDto dto){
 		if(dto.getDescription() != null) project.setDescription(dto.getDescription());
 		if(dto.getName() != null) project.setDescription(dto.getDescription());
-
-		return project;
 	}
 
 	public ProjectResponseDto toResponseDto(Project project){

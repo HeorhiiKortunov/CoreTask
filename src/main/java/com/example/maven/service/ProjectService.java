@@ -44,7 +44,9 @@ public class ProjectService {
 	}
 
 	public ProjectResponseDto updateProject(long id, ProjectUpdateDto dto){
-		var savedProject = projectRepository.save(projectMapper.fromUpdateDto(getProjectById(id), dto));
+		var project = getProjectById(id);
+		projectMapper.fromUpdateDto(project, dto);
+		var savedProject = projectRepository.save(project);
 		return projectMapper.toResponseDto(savedProject);
 	}
 
