@@ -51,8 +51,14 @@ public class TaskService {
 		return taskMapper.toResponseDto(savedTask);
 	}
 
-	public List<TaskResponseDto> findAllTasksByProjectId(long projectId){
+	public List<TaskResponseDto> findAllTasksByProjectId(Long projectId){
 		long tenantId = SecurityUtils.getCurrentTenantId();
+
+		if(projectId == null){
+			return taskRepository.findAllByCompany_Id(tenantId).stream()
+					.map(taskMapper::toResponseDto)
+					.toList();
+		}
 
 		return taskRepository.findAllByCompany_IdAndProject_Id(tenantId, projectId).stream()
 				.map(taskMapper::toResponseDto)

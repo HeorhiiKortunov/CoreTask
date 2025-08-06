@@ -38,8 +38,10 @@ public class UserController {
 		return ResponseEntity.ok(userService.updateUserRolesById(id, dto));
 	}
 
-	@PutMapping("/me")
-	public ResponseEntity<UserResponseDto> updateCurrentUser(@AuthenticationPrincipal UserPrincipal principal, @RequestBody UserUpdateRolesDto dto){
+	@PatchMapping("/me")
+	public ResponseEntity<UserResponseDto> updateCurrentUser(@AuthenticationPrincipal UserPrincipal principal,
+	                                                         @RequestBody UserUpdateRolesDto dto
+	){
 		return ResponseEntity.ok(userService.updateUserRolesById(principal.getId(), dto));
 	}
 

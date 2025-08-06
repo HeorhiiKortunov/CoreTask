@@ -31,7 +31,7 @@ public class ProjectController {
 		return ResponseEntity.ok(projectService.findById(id));
 	}
 
-	@PutMapping("/{id}")
+	@PatchMapping("/{id}")
 	public ResponseEntity<ProjectResponseDto> updateProject(@PathVariable long id, @RequestBody ProjectUpdateDto dto){
 		return ResponseEntity.ok(projectService.updateProject(id, dto));
 	}
