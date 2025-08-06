@@ -54,16 +54,6 @@ public class UserService {
 		return userMapper.toResponseDto(savedUser);
 	}
 
-	//for user himself
-	public UserResponseDto updateCurrentUser(UserUpdateDto dto){
-		long currentUserId = SecurityUtils.getCurrentUserId();
-		var user = getUserById(currentUserId);
-		userMapper.updateFromDto(user, dto);
-		var savedUser = userRepository.save(user);
-
-		return userMapper.toResponseDto(savedUser);
-	}
-
 	public UserResponseDto updateUserRolesById(long id, UserUpdateRolesDto dto) {
 		var user = getUserById(id);
 		userMapper.updateRolesFromDto(user, dto);
