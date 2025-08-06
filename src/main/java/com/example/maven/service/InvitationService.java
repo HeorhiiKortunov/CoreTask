@@ -28,6 +28,7 @@ public class InvitationService {
 	private final CompanyRepository companyRepository;
 	private final UserRepository userRepository;
 	private final UserMapper userMapper;
+	private final EmailService emailService;
 
 	public void inviteUser(InvitationCreateDto dto) {
 		var company = companyRepository.findById(SecurityUtils.getCurrentTenantId())
@@ -39,7 +40,8 @@ public class InvitationService {
 
 		invitationRepository.save(invitation);
 
-		// TODO: email sending logic
+		String inviteLink = "http://localhost::8080/api/invitations/accept?token=" + invitation.getToken();
+		emailService.sendInvitationEmail(invitation.getEmail(), inviteLink);
 	}
 
 
