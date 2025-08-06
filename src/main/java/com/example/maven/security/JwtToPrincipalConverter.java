@@ -15,7 +15,7 @@ public class JwtToPrincipalConverter {
 	public UserPrincipal convert(DecodedJWT jwt){
 		return UserPrincipal.builder()
 				.id(Long.parseLong(jwt.getSubject()))
-				.username(jwt.getClaim("email").asString())
+				.username(jwt.getClaim("username").asString())
 				.tenantId(jwt.getClaim("companyId").asLong())
 				.roles(extractAuthoritiesFromClaim(jwt))
 				.build();

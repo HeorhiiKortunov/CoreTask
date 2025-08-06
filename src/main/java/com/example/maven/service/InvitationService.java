@@ -17,6 +17,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -28,12 +29,19 @@ public class InvitationService {
 	private final UserRepository userRepository;
 	private final UserMapper userMapper;
 
-	public void inviteUser(InvitationCreateDto dto){
-		var invitation = invitationMapper.fromCreateDto(dto, companyRepository.findById(SecurityUtils.getCurrentTenantId())
-				.orElseThrow(() -> new ResourceNotFoundException("Company not found")));
+	public void inviteUser(InvitationCreateDto dto) {
+		var company = companyRepository.findById(SecurityUtils.getCurrentTenantId())
+				.orElseThrow(() -> new ResourceNotFoundException("Company not found"));
+
+		var invitation = invitationMapper.fromCreateDto(dto, company);
+		invitation.setToken(UUID.randomUUID().toString());
+		invitation.setExpiresAt(LocalDateTime.now().plusDays(2));
+
 		invitationRepository.save(invitation);
-		//TODO: email sending logic
+
+		// TODO: email sending logic
 	}
+
 
 	public UserResponseDto acceptInvitation(String token, InvitationAcceptDto dto){
 		Invitation invitation = invitationRepository.findByToken(token)
