@@ -45,8 +45,19 @@ public class UserService {
 				.toList();
 	}
 
+	//for admin
 	public UserResponseDto updateUser(long id, UserUpdateDto dto) {
 		var user = getUserById(id);
+		userMapper.updateFromDto(user, dto);
+		var savedUser = userRepository.save(user);
+
+		return userMapper.toResponseDto(savedUser);
+	}
+
+	//for user himself
+	public UserResponseDto updateCurrentUser(UserUpdateDto dto){
+		long currentUserId = SecurityUtils.getCurrentUserId();
+		var user = getUserById(currentUserId);
 		userMapper.updateFromDto(user, dto);
 		var savedUser = userRepository.save(user);
 
@@ -61,7 +72,6 @@ public class UserService {
 		return userMapper.toResponseDto(savedUser);
 	}
 
-	//TODO: Only for the user himself or admin(in controller)
 	public void deleteUser(long id) {
 		userRepository.delete(getUserById(id));
 	}
