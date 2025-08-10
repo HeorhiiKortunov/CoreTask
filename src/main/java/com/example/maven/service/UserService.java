@@ -13,6 +13,7 @@ import com.example.maven.utils.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -26,9 +27,11 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final UserMapper userMapper;
 	private final CompanyRepository companyRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	public UserResponseDto createUser(UserCreateDto dto){
 		var user = userMapper.fromCreateDto(dto);
+		user.setPassword(passwordEncoder.encode(dto.password()));
 		user.setCompany(companyRepository.findById(SecurityUtils.getCurrentTenantId())
 				.orElseThrow(() -> new AccessDeniedException("No current company found")));
 		var savedUser = userRepository.save(user);
@@ -38,6 +41,7 @@ public class UserService {
 
 	public UserResponseDto createUserForRegistration(UserCreateDto dto, Long companyId) {
 		var user = userMapper.fromCreateDto(dto);
+		user.setPassword(passwordEncoder.encode(dto.password()));
 		user.setCompany(companyRepository.getReferenceById(companyId));
 		var saved = userRepository.save(user);
 		return userMapper.toResponseDto(saved);

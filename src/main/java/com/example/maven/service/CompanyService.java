@@ -23,11 +23,9 @@ public class CompanyService {
 	private final UserService userService;
 
 	public CompanyResponseDto createCompany(CompanyCreateDto dto) {
-		// 1) Создаём компанию
 		var company = companyMapper.fromCreateDto(dto);
 		var savedCompany = companyRepository.save(company);
 
-		// 2) Создаём владельца, указав companyId явно
 		var ownerDto = new UserCreateDto(
 				dto.owner().username(),
 				dto.owner().displayedName(),
@@ -36,7 +34,6 @@ public class CompanyService {
 		);
 		UserResponseDto owner = userService.createUserForRegistration(ownerDto, savedCompany.getId());
 
-		// 3) Назначаем роли владельцу без методной безопасности
 		UserUpdateRolesDto rolesDto = new UserUpdateRolesDto(
 				Set.of(Role.ROLE_MEMBER, Role.ROLE_ADMIN, Role.ROLE_OWNER)
 		);
