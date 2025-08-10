@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -33,6 +34,13 @@ public class UserService {
 		var savedUser = userRepository.save(user);
 
 		return userMapper.toResponseDto(savedUser);
+	}
+
+	public UserResponseDto createUserForRegistration(UserCreateDto dto, Long companyId) {
+		var user = userMapper.fromCreateDto(dto);
+		user.setCompany(companyRepository.getReferenceById(companyId));
+		var saved = userRepository.save(user);
+		return userMapper.toResponseDto(saved);
 	}
 
 	public UserResponseDto findById(long id) {
@@ -60,6 +68,14 @@ public class UserService {
 		var savedUser = userRepository.save(user);
 
 		return userMapper.toResponseDto(savedUser);
+	}
+
+	public void updateUserRolesByIdWithoutSecurity(Long userId, UserUpdateRolesDto dto) {
+		var user = userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
+
+		user.setRoles(new HashSet<>(dto.roles()));
+		userRepository.save(user);
 	}
 
 	public void deleteUser(long id) {

@@ -1,6 +1,7 @@
 package com.example.maven.service;
 
 import com.example.maven.api.dto.request.company.CompanyCreateDto;
+import com.example.maven.api.dto.request.user.UserCreateDto;
 import com.example.maven.api.dto.request.user.UserUpdateRolesDto;
 import com.example.maven.api.dto.response.CompanyResponseDto;
 import com.example.maven.api.dto.response.UserResponseDto;
@@ -21,19 +22,32 @@ public class CompanyService {
 	private final CompanyMapper companyMapper;
 	private final UserService userService;
 
-	public CompanyResponseDto createCompany(CompanyCreateDto dto){
-		//Creating owner
-		UserResponseDto owner = userService.createUser(dto.owner());
-		UserUpdateRolesDto rolesDto = new UserUpdateRolesDto(Set.of(Role.ROLE_MEMBER, Role.ROLE_ADMIN, Role.ROLE_OWNER));
-		userService.updateUserRolesById(owner.id(), rolesDto);
+	public CompanyResponseDto createCompany(CompanyCreateDto dto) {
+		// 1) Создаём компанию
+		var company = companyMapper.fromCreateDto(dto);
+		var savedCompany = companyRepository.save(company);
 
-		//Creating the company itself
-		var savedCompany = companyRepository.save(companyMapper.fromCreateDto(dto));
+		// 2) Создаём владельца, указав companyId явно
+		var ownerDto = new UserCreateDto(
+				dto.owner().username(),
+				dto.owner().displayedName(),
+				dto.owner().email(),
+				dto.owner().password()
+		);
+		UserResponseDto owner = userService.createUserForRegistration(ownerDto, savedCompany.getId());
+
+		// 3) Назначаем роли владельцу без методной безопасности
+		UserUpdateRolesDto rolesDto = new UserUpdateRolesDto(
+				Set.of(Role.ROLE_MEMBER, Role.ROLE_ADMIN, Role.ROLE_OWNER)
+		);
+		userService.updateUserRolesByIdWithoutSecurity(owner.id(), rolesDto);
 
 		return companyMapper.toResponseDto(savedCompany);
 	}
 
-	//TODO: Only for the owner(in controller)
+
+
+
 	public void deleteCompany(long id){
 		companyRepository.deleteById(id);
 	}

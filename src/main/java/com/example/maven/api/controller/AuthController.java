@@ -10,6 +10,7 @@ import com.example.maven.api.dto.response.UserResponseDto;
 import com.example.maven.service.AuthService;
 import com.example.maven.service.CompanyService;
 import com.example.maven.service.UserService;
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,11 +31,13 @@ public class AuthController {
 	private final AuthService authService;
 	private final CompanyService companyService;
 
+	@PermitAll
 	@PostMapping("/login")
 	public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request){
 		return ResponseEntity.ok(authService.attemptLogin(request.username(), request.password()));
 	}
 
+	@PermitAll
 	@PostMapping("/register-company")
 	public ResponseEntity<CompanyResponseDto> registerCompany(@Valid @RequestBody CompanyCreateDto dto) {
 		CompanyResponseDto responseDto = companyService.createCompany(dto);

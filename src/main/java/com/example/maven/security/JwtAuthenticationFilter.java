@@ -21,13 +21,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-		extractTokenFromRequest(request)
-				.map(jwtDecoder::decode)
-				.map(jwtToPrincipalConverter::convert)
-				.map(UserPrincipalAuthToken::new)
-				.ifPresent(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication));
+		String path = request.getRequestURI();
+		System.out.println("Processing request for path: " + path);  // Add this
+
+		// Skip JWT authentication for public endpoints
+		if (path.startsWith("/api/auth/") || path.equals("/api/invitations/accept")) {
+			System.out.println("Skipping JWT for public path: " + path);  // Add this
+			filterChain.doFilter(request, response);
+			return;
+		}
+
+		try {
+			extractTokenFromRequest(request)
+					.map(jwtDecoder::decode)
+					.map(jwtToPrincipalConverter::convert)
+					.map(UserPrincipalAuthToken::new)
+					.ifPresent(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication));
+		} catch (Exception ex) {
+			System.out.println("EXCEPTION IN SECURITY");
+		}
+
 		filterChain.doFilter(request, response);
 	}
+
 
 	private Optional<String> extractTokenFromRequest(HttpServletRequest request){
 		var token = request.getHeader("Authorization");
