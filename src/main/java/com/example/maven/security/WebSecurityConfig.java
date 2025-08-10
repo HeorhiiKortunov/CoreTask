@@ -39,7 +39,9 @@ public class WebSecurityConfig {
 				)
 				.securityMatcher("/api/**")
 				.authorizeHttpRequests(auth -> auth
-						.anyRequest().permitAll()
+						.requestMatchers("/api/auth/**").permitAll()
+						.requestMatchers("/api/invitations/accept").permitAll()
+						.anyRequest().authenticated()
 				);
 
 		return http.build();
