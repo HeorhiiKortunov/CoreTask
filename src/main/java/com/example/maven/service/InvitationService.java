@@ -12,16 +12,19 @@ import com.example.maven.persistence.repository.InvitationRepository;
 import com.example.maven.persistence.repository.UserRepository;
 import com.example.maven.utils.SecurityUtils;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
 @Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class InvitationService {
 	private final InvitationRepository invitationRepository;
 	private final InvitationMapper invitationMapper;
@@ -29,6 +32,10 @@ public class InvitationService {
 	private final UserRepository userRepository;
 	private final UserMapper userMapper;
 	private final EmailService emailService;
+	private final PasswordEncoder passwordEncoder;
+
+	@Value("${app.public-base-url:http://localhost:8080}")
+	private String publicBaseUrl;
 
 	public void inviteUser(InvitationCreateDto dto) {
 		var company = companyRepository.findById(SecurityUtils.getCurrentTenantId())
@@ -37,11 +44,23 @@ public class InvitationService {
 		var invitation = invitationMapper.fromCreateDto(dto, company);
 		invitation.setToken(UUID.randomUUID().toString());
 		invitation.setExpiresAt(LocalDateTime.now().plusDays(2));
-
 		invitationRepository.save(invitation);
 
-		String inviteLink = "http://localhost::8080/api/invitations/accept?token=" + invitation.getToken();
-		emailService.sendInvitationEmail(invitation.getEmail(), inviteLink);
+		String inviteLink = UriComponentsBuilder
+				.fromHttpUrl(publicBaseUrl)
+				.path("/api/invitations/accept")
+				.queryParam("token", invitation.getToken())
+				.toUriString();
+
+		emailService.sendInvitationEmail(
+				invitation.getEmail(),
+				"Invitation to join company",
+				"""
+				<p>You were invited to join our company.</p>
+				<p><a href="%s">Click here to accept</a></p>
+				<p>The link is available for 48 hours.</p>
+				""".formatted(inviteLink)
+		);
 	}
 
 
@@ -54,6 +73,7 @@ public class InvitationService {
 		}
 
 		var user = invitationMapper.fromAcceptDto(dto, invitation);
+		user.setPassword(passwordEncoder.encode(dto.password()));
 		var savedUser = userRepository.save(user);
 
 		invitation.setAccepted(true);
