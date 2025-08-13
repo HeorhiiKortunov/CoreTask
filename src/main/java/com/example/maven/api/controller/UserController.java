@@ -5,6 +5,7 @@ import com.example.maven.api.dto.request.user.UserUpdateRolesDto;
 import com.example.maven.api.dto.response.UserResponseDto;
 import com.example.maven.security.UserPrincipal;
 import com.example.maven.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,21 +40,21 @@ public class UserController {
 
 	@PutMapping("/roles/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<UserResponseDto> updateUserRoles(@PathVariable long id, @RequestBody UserUpdateRolesDto dto){
+	public ResponseEntity<UserResponseDto> updateUserRoles(@PathVariable long id, @Valid @RequestBody UserUpdateRolesDto dto){
 		return ResponseEntity.ok(userService.updateUserRolesById(id, dto));
 	}
 
 	@PatchMapping("/me")
 	@PreAuthorize("hasRole('MEMBER')")
 	public ResponseEntity<UserResponseDto> updateCurrentUser(@AuthenticationPrincipal UserPrincipal principal,
-	                                                         @RequestBody UserUpdateRolesDto dto
+	                                                         @Valid @RequestBody UserUpdateRolesDto dto
 	){
 		return ResponseEntity.ok(userService.updateUserRolesById(principal.getId(), dto));
 	}
 
 	@PutMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<UserResponseDto> updateUser(@PathVariable long id, @RequestBody UserUpdateDto dto){
+	public ResponseEntity<UserResponseDto> updateUser(@PathVariable long id, @Valid @RequestBody UserUpdateDto dto){
 		return ResponseEntity.ok(userService.updateUser(id, dto));
 	}
 

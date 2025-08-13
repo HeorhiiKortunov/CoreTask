@@ -22,11 +22,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		String path = request.getRequestURI();
-		System.out.println("Processing request for path: " + path);  // Add this
+		System.out.println("Processing request for path: " + path);
 
-		// Skip JWT authentication for public endpoints
 		if (path.startsWith("/api/auth/") || path.equals("/api/invitations/accept")) {
-			System.out.println("Skipping JWT for public path: " + path);  // Add this
+			System.out.println("Skipping JWT for public path: " + path);
 			filterChain.doFilter(request, response);
 			return;
 		}
