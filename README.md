@@ -32,7 +32,7 @@ Core Task is a RESTful service for managing companies, projects, and tasks. Buil
 Clone the repository:
 
 ```bash
-git clone https://github.com/<your-username>/core-task.git
+git clone https://github.com/HeorhiiKortunov/CoreTask.git
 cd core-task
 ```
 
@@ -47,7 +47,7 @@ By default, PostgreSQL will be available on localhost:5432.
 Run the application:
 
 ```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=prod
+mvn spring-boot:run -Dspring-boot.run
 ```
 
 The API will be available at:
