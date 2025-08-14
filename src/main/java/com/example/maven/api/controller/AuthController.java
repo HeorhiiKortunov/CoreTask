@@ -1,20 +1,15 @@
 package com.example.maven.api.controller;
 
 import com.example.maven.api.dto.request.auth.LoginRequest;
-import com.example.maven.api.dto.request.comment.CommentCreateDto;
 import com.example.maven.api.dto.request.company.CompanyCreateDto;
-import com.example.maven.api.dto.response.CommentResponseDto;
 import com.example.maven.api.dto.response.CompanyResponseDto;
 import com.example.maven.api.dto.response.LoginResponse;
-import com.example.maven.api.dto.response.UserResponseDto;
 import com.example.maven.service.AuthService;
 import com.example.maven.service.CompanyService;
-import com.example.maven.service.UserService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
