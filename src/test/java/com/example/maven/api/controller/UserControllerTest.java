@@ -26,11 +26,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Интеграционные MVC-тесты для UserController с реальной SecurityFilterChain.
- * CSRF у тебя выключен, поэтому без .with(csrf()).
- * Роли/пользователь подменяются через @WithMockTenantUser.
- */
+
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = true)
 @Import(WebSecurityConfig.class)
@@ -149,7 +145,7 @@ class UserControllerTest {
 				.andExpect(status().isUnauthorized());
 	}
 
-	// ---------- PATCH /api/users/me (меняет роли текущего) ----------
+	// ---------- PATCH /api/users/me ----------
 	@WithMockTenantUser(userId = 10L, roles = { Role.ROLE_MEMBER })
 	@Test
 	void givenMember_whenPatchMeRoles_then200() throws Exception {
@@ -176,12 +172,11 @@ class UserControllerTest {
 				.andExpect(status().isUnauthorized());
 	}
 
-	// ---------- PUT /api/users/{id} (UserUpdateDto: displayedName + email) ----------
+	// ---------- PUT /api/users/{id} ----------
 	@WithMockTenantUser(roles = { Role.ROLE_ADMIN })
 	@Test
 	void givenAdmin_whenUpdateUser_withValidEmail_then200() throws Exception {
 		var req = new UserUpdateDto();
-		// setter-ы у Lombok @Getter нет — поэтому соберём JSON строкой
 		String json = """
                 {
                   "displayedName": "New Name",
@@ -204,7 +199,6 @@ class UserControllerTest {
 	@WithMockTenantUser(roles = { Role.ROLE_ADMIN })
 	@Test
 	void givenAdmin_whenUpdateUser_withInvalidEmail_then400() throws Exception {
-		// Работает только если в контроллере стоит @Valid на @RequestBody UserUpdateDto
 		String json = """
                 {
                   "displayedName": "Any",
