@@ -33,12 +33,13 @@ public class InvitationService {
 	private final UserMapper userMapper;
 	private final EmailService emailService;
 	private final PasswordEncoder passwordEncoder;
+	private final SecurityUtils securityUtils;
 
 	@Value("${app.public-base-url:http://localhost:8080}")
 	private String publicBaseUrl;
 
 	public void inviteUser(InvitationCreateDto dto) {
-		var company = companyRepository.findById(SecurityUtils.getCurrentTenantId())
+		var company = companyRepository.findById(securityUtils.getCurrentTenantId())
 				.orElseThrow(() -> new ResourceNotFoundException("Company not found"));
 
 		var invitation = invitationMapper.fromCreateDto(dto, company);
