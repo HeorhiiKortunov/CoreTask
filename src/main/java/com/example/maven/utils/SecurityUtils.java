@@ -5,18 +5,20 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
+@Component("securityUtils")
 public class SecurityUtils {
 
-	public static Long getCurrentTenantId() {
+	public Long getCurrentTenantId() {
 		return getPrincipal().getTenantId();
 	}
 
-	public static Long getCurrentUserId() {
+	public Long getCurrentUserId() {
 		return getPrincipal().getId();
 	}
 
-	private static UserPrincipal getPrincipal() {
+	private UserPrincipal getPrincipal() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
 		if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
