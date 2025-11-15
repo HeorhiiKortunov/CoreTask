@@ -35,6 +35,7 @@ class CommentServiceTest {
     @Mock private CompanyRepository companyRepository;
     @Mock private UserRepository userRepository;
     @Mock private CommentMapper commentMapper;
+    @Mock private SecurityUtils securityUtils;
 
     @InjectMocks
     private CommentService commentService;
@@ -42,27 +43,22 @@ class CommentServiceTest {
     private static final long TENANT_ID = 99L;
     private static final long CURRENT_USER_ID = 777L;
 
-    private MockedStatic<SecurityUtils> securityUtilsMock;
-
     private Company company;
     private Task task;
     private User author;
 
     @BeforeEach
     void setUp() {
-        securityUtilsMock = mockStatic(SecurityUtils.class);
-        securityUtilsMock.when(SecurityUtils::getCurrentTenantId).thenReturn(TENANT_ID);
-        securityUtilsMock.when(SecurityUtils::getCurrentUserId).thenReturn(CURRENT_USER_ID);
+        // Mock instance methods instead of static
+        when(securityUtils.getCurrentTenantId()).thenReturn(TENANT_ID);
+        when(securityUtils.getCurrentUserId()).thenReturn(CURRENT_USER_ID);
 
         company = new Company(); company.setId(TENANT_ID);
         task = new Task(); task.setId(10L);
         author = new User(); author.setId(CURRENT_USER_ID);
     }
 
-    @AfterEach
-    void tearDown() {
-        securityUtilsMock.close();
-    }
+    // No need for tearDown() anymore - no static mocking!
 
     // createComment
     @Test
@@ -223,7 +219,7 @@ class CommentServiceTest {
     void givenAuthorIsCurrentUser_whenDeleteMyCommentById_thenDeletes() {
         long id = 21L;
         Comment existing = new Comment(); existing.setId(id);
-        existing.setAuthor(author); // текущий пользователь — автор
+        existing.setAuthor(author);
 
         when(commentRepository.findByIdAndCompany_Id(id, TENANT_ID)).thenReturn(Optional.of(existing));
 
