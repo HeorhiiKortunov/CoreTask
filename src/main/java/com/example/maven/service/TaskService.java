@@ -16,6 +16,9 @@ import com.example.maven.persistence.repository.UserRepository;
 import com.example.maven.utils.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,9 +32,12 @@ public class TaskService {
 	private final ProjectRepository projectRepository;
 	private final CompanyRepository companyRepository;
 	private final UserRepository userRepository;
+	private final SecurityUtils securityUtils;
 
+	// Evict all task list caches when creating (allEntries since we don't know which projectId caches exist)
+	@CacheEvict(value = "projectTasks", allEntries = true)
 	public TaskResponseDto createTask(TaskCreateDto dto){
-		long tenantId = SecurityUtils.getCurrentTenantId();
+		long tenantId = securityUtils.getCurrentTenantId();
 
 		Project project = projectRepository.findByIdAndCompany_Id(dto.getProjectId(), tenantId)
 				.orElseThrow(() -> new ResourceNotFoundException("Project not found"));
@@ -51,8 +57,10 @@ public class TaskService {
 		return taskMapper.toResponseDto(savedTask);
 	}
 
+	// Cache tasks by project - separate cache for each projectId (or null for all tasks)
+	@Cacheable(value = "projectTasks", key = "@securityUtils.getCurrentTenantId() + '_' + (#projectId != null ? #projectId : 'all')")
 	public List<TaskResponseDto> findAllTasksByProjectId(Long projectId){
-		long tenantId = SecurityUtils.getCurrentTenantId();
+		long tenantId = securityUtils.getCurrentTenantId();
 
 		if(projectId == null){
 			return taskRepository.findAllByCompany_Id(tenantId).stream()
@@ -65,14 +73,21 @@ public class TaskService {
 				.toList();
 	}
 
+	// Cache individual task by ID
+	@Cacheable(value = "tasks", key = "#id + '_' + @securityUtils.getCurrentTenantId()")
 	public TaskResponseDto findTaskById(long id){
-		long tenantId = SecurityUtils.getCurrentTenantId();
+		long tenantId = securityUtils.getCurrentTenantId();
 		return taskMapper.toResponseDto(taskRepository.findByIdAndCompany_Id(id, tenantId)
 				.orElseThrow(() -> new ResourceNotFoundException("Task not found")));
 	}
 
+	// Evict both individual task cache and all project task list caches
+	@Caching(evict = {
+			@CacheEvict(value = "tasks", key = "#id + '_' + @securityUtils.getCurrentTenantId()"),
+			@CacheEvict(value = "projectTasks", allEntries = true)
+	})
 	public TaskResponseDto updateTaskById(long id, TaskUpdateDto dto){
-		long tenantId = SecurityUtils.getCurrentTenantId();
+		long tenantId = securityUtils.getCurrentTenantId();
 		Task task = taskRepository.findByIdAndCompany_Id(id, tenantId)
 				.orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
@@ -82,8 +97,13 @@ public class TaskService {
 		return taskMapper.toResponseDto(savedTask);
 	}
 
+	// Evict both individual task cache and all project task list caches
+	@Caching(evict = {
+			@CacheEvict(value = "tasks", key = "#id + '_' + @securityUtils.getCurrentTenantId()"),
+			@CacheEvict(value = "projectTasks", allEntries = true)
+	})
 	public void deleteTaskById(long id){
-		long tenantId = SecurityUtils.getCurrentTenantId();
+		long tenantId = securityUtils.getCurrentTenantId();
 		Task task = taskRepository.findByIdAndCompany_Id(id, tenantId)
 				.orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
