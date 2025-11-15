@@ -28,29 +28,25 @@ class ProjectServiceTest {
     @Mock private ProjectRepository projectRepository;
     @Mock private ProjectMapper projectMapper;
     @Mock private CompanyRepository companyRepository;
+    @Mock private SecurityUtils securityUtils;
 
     @InjectMocks
     private ProjectService projectService;
 
     private static final long TENANT_ID = 123L;
 
-    private MockedStatic<SecurityUtils> securityUtilsMock;
-
     private Company company;
 
     @BeforeEach
     void setUp() {
-        securityUtilsMock = mockStatic(SecurityUtils.class);
-        securityUtilsMock.when(SecurityUtils::getCurrentTenantId).thenReturn(TENANT_ID);
+        // Mock instance method instead of static
+        when(securityUtils.getCurrentTenantId()).thenReturn(TENANT_ID);
 
         company = new Company();
         company.setId(TENANT_ID);
     }
 
-    @AfterEach
-    void tearDown() {
-        securityUtilsMock.close();
-    }
+    // No need for tearDown() anymore!
 
     // createProject
     @Test

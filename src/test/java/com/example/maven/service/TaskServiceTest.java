@@ -35,13 +35,12 @@ class TaskServiceTest {
 	@Mock private ProjectRepository projectRepository;
 	@Mock private CompanyRepository companyRepository;
 	@Mock private UserRepository userRepository;
+	@Mock private SecurityUtils securityUtils;
 
 	@InjectMocks
 	private TaskService taskService;
 
 	private static final long TENANT_ID = 77L;
-
-	private MockedStatic<SecurityUtils> securityUtilsMock;
 
 	private Company company;
 	private Project project;
@@ -50,17 +49,14 @@ class TaskServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		securityUtilsMock = mockStatic(SecurityUtils.class);
-		securityUtilsMock.when(SecurityUtils::getCurrentTenantId).thenReturn(TENANT_ID);
+		// Mock instance method instead of static
+		when(securityUtils.getCurrentTenantId()).thenReturn(TENANT_ID);
 
 		company = new Company(); company.setId(TENANT_ID);
 		project = new Project(); project.setId(10L);
 	}
 
-	@AfterEach
-	void tearDown() {
-		securityUtilsMock.close();
-	}
+	// No need for tearDown() anymore!
 
 	// createTask
 	@Test

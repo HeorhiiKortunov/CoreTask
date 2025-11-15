@@ -38,6 +38,7 @@ class InvitationServiceTest {
 	@Mock private UserMapper userMapper;
 	@Mock private EmailService emailService;
 	@Mock private PasswordEncoder passwordEncoder;
+	@Mock private SecurityUtils securityUtils;
 
 	@InjectMocks
 	private InvitationService invitationService;
@@ -50,7 +51,7 @@ class InvitationServiceTest {
 	@BeforeEach
 	void setUp() {
 		securityUtilsMock = mockStatic(SecurityUtils.class);
-		securityUtilsMock.when(SecurityUtils::getCurrentTenantId).thenReturn(TENANT_ID);
+		securityUtilsMock.when(securityUtils::getCurrentTenantId).thenReturn(TENANT_ID);
 
 		company = new Company();
 		company.setId(TENANT_ID);

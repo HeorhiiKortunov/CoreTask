@@ -31,28 +31,25 @@ class UserServiceTest {
 	@Mock private UserMapper userMapper;
 	@Mock private CompanyRepository companyRepository;
 	@Mock private PasswordEncoder passwordEncoder;
+	@Mock private SecurityUtils securityUtils;
 
 	@InjectMocks
 	private UserService userService;
 
 	private static final long TENANT_ID = 42L;
 
-	private MockedStatic<SecurityUtils> securityUtilsMock;
 	private Company company;
 
 	@BeforeEach
 	void setUp() {
-		securityUtilsMock = mockStatic(SecurityUtils.class);
-		securityUtilsMock.when(SecurityUtils::getCurrentTenantId).thenReturn(TENANT_ID);
+		// Mock instance methods instead of static
+		when(securityUtils.getCurrentTenantId()).thenReturn(TENANT_ID);
 
 		company = new Company();
 		company.setId(TENANT_ID);
 	}
 
-	@AfterEach
-	void tearDown() {
-		if (securityUtilsMock != null) securityUtilsMock.close();
-	}
+	// No need for tearDown() anymore!
 
 	// createUser
 	@Test
